@@ -9,16 +9,18 @@
 import UIKit
 
 extension UIToolbar {
-	
 	convenience init(target: Any, selector: Selector) {
-		
 		let rect = CGRect(x: 0.0, y: 0.0, width: UIScreen.main.bounds.size.width, height: 44.0)
 		let flexible = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-		let barButton = UIBarButtonItem(barButtonSystemItem: .done, target: target, action: selector)
+        let barButton = UIBarButtonItem(title: nil, style: .done, target: target, action: selector)
 		
 		self.init(frame: rect)
-		barStyle = .black
-		tintColor = .white
+        barStyle = .default
+        if #available(iOS 13.0, *) {
+            tintColor = .label
+        } else {
+            tintColor = .blue
+        }
 		setItems([flexible, barButton], animated: false)
 	}
 }
@@ -112,10 +114,10 @@ open class AnimatedField: UIView {
     /// Field type (default values)
     public var type: AnimatedFieldType = .none {
         didSet {
-            if case let AnimatedFieldType.datepicker(mode, defaultDate, minDate, maxDate, chooseText, format) = type {
+            if case let AnimatedFieldType.datepicker(mode, defaultDate, minDate, maxDate, chooseText, format, locale) = type {
                 initialDate = defaultDate
                 dateFormat = format
-                setupDatePicker(mode: mode, minDate: minDate, maxDate: maxDate, chooseText: chooseText)
+                setupDatePicker(mode: mode, minDate: minDate, maxDate: maxDate, chooseText: chooseText, locale: locale)
             }
             if case let AnimatedFieldType.numberpicker(defaultNumber, minNumber, maxNumber, chooseText) = type {
                 setupNumberPicker(defaultNumber: defaultNumber, minNumber: minNumber, maxNumber: maxNumber, chooseText: chooseText)
@@ -322,15 +324,20 @@ open class AnimatedField: UIView {
         layoutIfNeeded()
     }
     
-    private func setupDatePicker(mode: UIDatePicker.Mode?, minDate: Date?, maxDate: Date?, chooseText: String?) {
+    private func setupDatePicker(mode: UIDatePicker.Mode?, minDate: Date?, maxDate: Date?, chooseText: String?, locale: Locale?) {
         datePicker = UIDatePicker()
+        if #available(iOS 13.4, *) {
+            datePicker?.preferredDatePickerStyle = .wheels
+        }
+        datePicker?.locale = locale
         datePicker?.datePickerMode = mode ?? .date
         datePicker?.maximumDate = maxDate
         datePicker?.minimumDate = minDate
         datePicker?.setValue(format.textColor, forKey: "textColor")
         
         let toolBar = UIToolbar(target: self, selector: #selector(didChooseDatePicker))
-		
+        toolBar.items?.last?.title = chooseText
+        
         textField.inputAccessoryView = accessoryView ?? toolBar
         textField.inputView = datePicker
     }
@@ -347,6 +354,7 @@ open class AnimatedField: UIView {
         }
         
 		let toolBar = UIToolbar(target: self, selector: #selector(didChooseNumberPicker))
+        toolBar.items?.last?.title = chooseText
 		
         textField.inputAccessoryView = accessoryView ?? toolBar
         textField.inputView = numberPicker
@@ -365,6 +373,7 @@ open class AnimatedField: UIView {
         }
         
         let toolBar = UIToolbar(target: self, selector: #selector(didChooseStringPicker))
+        toolBar.items?.last?.title = chooseText
         
         textField.inputAccessoryView = accessoryView ?? toolBar
         textField.inputView = stringPicker
@@ -391,7 +400,7 @@ open class AnimatedField: UIView {
     
     @objc func didChooseDatePicker() {
         let date = datePicker?.date ?? initialDate
-        textField.text = date?.format(dateFormat: dateFormat ?? "dd / MM / yyyy")
+        textField.text = date?.format(dateFormat: dateFormat ?? "dd / MM / yyyy", locale: datePicker?.locale)
         _ = resignFirstResponder()
     }
     
@@ -402,6 +411,10 @@ open class AnimatedField: UIView {
     
     @objc func didChooseStringPicker() {
 //        textField.text = stringPicker
+        if let selectedRow = stringPicker?.selectedRow(inComponent: 0) {
+            let string = stringOptions[selectedRow]
+            textField.text = string
+        }
         _ = resignFirstResponder()
     }
 }
@@ -409,7 +422,6 @@ open class AnimatedField: UIView {
 // CLASS METHODS
 
 extension AnimatedField {
-    
     func animateIn() {
         isPlaceholderVisible = false
         titleLabelTextViewConstraint?.constant = 1

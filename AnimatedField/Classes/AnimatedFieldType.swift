@@ -17,7 +17,7 @@ public enum AnimatedFieldType {
     case password(Int, Int) // min, max
     case price(Double, Int) // max price, max decimals
     case url
-    case datepicker(UIDatePicker.Mode?, Date?, Date?, Date?, String?, String?) // mode, default date, min date, max date, choose text, date format
+    case datepicker(UIDatePicker.Mode?, Date?, Date?, Date?, String?, String?, Locale?) // mode, default date, min date, max date, choose text, date format
     case numberpicker(Int, Int, Int, String?) // default number, min number, max number, choose text
     case multiline
     case stringpicker([String], String?) // strings, choose text

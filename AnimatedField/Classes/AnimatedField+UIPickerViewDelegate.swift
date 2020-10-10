@@ -8,20 +8,19 @@
 import UIKit
 
 extension AnimatedField: UIPickerViewDataSource, UIPickerViewDelegate {
-    
     public func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
     
     public func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return numberOptions.count
+        return stringOptions.count
     }
     
     public func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return "\(numberOptions[row])"
+        return "\(stringOptions[row])"
     }
     
     public func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        delegate?.animatedField(self, didChangePickerValue: "\(numberOptions[row])")
+        delegate?.animatedField(self, didChangePickerValue: "\(stringOptions[row])")
     }
 }
