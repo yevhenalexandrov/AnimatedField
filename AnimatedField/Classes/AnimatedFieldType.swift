@@ -23,6 +23,7 @@ public enum AnimatedFieldType {
     case stringpicker([String], String?) // strings, choose text
     case text(Int, Int) // min, max
     case number(Int, Int, String?) // min, max, choose text
+    case phone(Int, String?) // count, choose text
     
     var decimal: String {
         var separator = Locale.current.decimalSeparator ?? "\\."
@@ -37,6 +38,7 @@ public enum AnimatedFieldType {
         case .text: return "[ЁёА-я -]"
         case .price: return "[0-9\(decimal)]"
         case .number: return "[0-9]"
+        case .phone: return "[0-9]"
         default: return ".*"
         }
     }
@@ -49,6 +51,7 @@ public enum AnimatedFieldType {
         case .password(let min, let max): return ".{\(min),\(max)}"
         case .price(_, let max): return "^(?=.*[1-9])([1-9]\\d*(?:\(decimal)\\d{1,\(max)})?|(?:0\(decimal)\\d{1,\(max)}))$"
         case .number(let min, let max, _): return "[0-9 ₽]{\(min),\(max)}"
+        case .phone(let count, _): return "[0-9 +()]{\(count)}"
         case .url: return "https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|www\\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\\.[^\\s]{2,}|https?:\\/\\/(?:www\\.|(?!www))[a-zA-Z0-9]+\\.[^\\s]{2,}|www\\.[a-zA-Z0-9]+\\.[^\\s]{2,}"
         default: return ".*"
         }
