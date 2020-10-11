@@ -27,7 +27,7 @@ extension UIToolbar {
 
 open class AnimatedField: UIView {
     
-    @IBOutlet weak private var textField: UITextField!
+    @IBOutlet weak public var textField: UITextField!
     @IBOutlet weak private var textFieldRightConstraint: NSLayoutConstraint!
     @IBOutlet weak private var titleLabel: UILabel!
     @IBOutlet weak private var alertLabel: UILabel!
@@ -110,6 +110,15 @@ open class AnimatedField: UIView {
 			textView.inputAccessoryView = accessoryView
 		}
 	}
+    
+    public var autocapitalizationType: UITextAutocapitalizationType {
+        get {
+            textField.autocapitalizationType
+        }
+        set {
+            textField.autocapitalizationType = newValue
+        }
+    }
 	
     /// Field type (default values)
     public var type: AnimatedFieldType = .none {
@@ -128,8 +137,16 @@ open class AnimatedField: UIView {
             if case AnimatedFieldType.price = type {
                 keyboardType = .decimalPad
             }
+            if case let AnimatedFieldType.number(_, _, chooseText) = type {
+                keyboardType = .numberPad
+                
+                setupNumberPad(chooseText: chooseText)
+            }
             if case AnimatedFieldType.email = type {
                 keyboardType = .emailAddress
+            }
+            if case AnimatedFieldType.text = type {
+                keyboardType = .default
             }
             if case AnimatedFieldType.url = type {
                 keyboardType = .URL
@@ -379,6 +396,13 @@ open class AnimatedField: UIView {
         textField.inputView = stringPicker
     }
     
+    private func setupNumberPad(chooseText: String?) {
+        let toolBar = UIToolbar(target: self, selector: #selector(didChooseNumberPad))
+        toolBar.items?.last?.title = chooseText
+        
+        textField.inputAccessoryView = accessoryView ?? toolBar
+    }
+    
     open override func becomeFirstResponder() -> Bool {
         textField.becomeFirstResponder()
         return super.becomeFirstResponder()
@@ -416,6 +440,10 @@ open class AnimatedField: UIView {
             textField.text = string
         }
         _ = resignFirstResponder()
+    }
+    
+    @objc func didChooseNumberPad() {
+        _ = dataSource?.animatedFieldShouldReturn(self)
     }
 }
 
