@@ -41,6 +41,7 @@ open class AnimatedField: UIView {
     @IBOutlet weak private var counterLabelTextFieldConstraint: NSLayoutConstraint?
     @IBOutlet weak private var counterLabelTextViewConstraint: NSLayoutConstraint?
     @IBOutlet private var alertLabelBottomConstraint: NSLayoutConstraint!
+    @IBOutlet private weak var eyeBottomConstraint: NSLayoutConstraint!
     
     /// Date picker values
     private var datePicker: UIDatePicker?
@@ -253,6 +254,24 @@ open class AnimatedField: UIView {
         set {
             textField.text = textField.isHidden ? nil : newValue
             textView.text = textView.isHidden ? "" : newValue
+        }
+    }
+    
+    open var textInsets: CGPoint {
+        get {
+            return CGPoint.zero
+        }
+        set {
+            textField.layer.sublayerTransform = CATransform3DMakeTranslation(newValue.x, newValue.y, 0);
+        }
+    }
+    
+    open var eyeVerticalInset: CGFloat {
+        get {
+            return 0
+        }
+        set {
+            eyeBottomConstraint.constant = newValue
         }
     }
     
