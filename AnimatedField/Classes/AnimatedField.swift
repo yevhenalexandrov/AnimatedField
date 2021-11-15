@@ -242,6 +242,7 @@ open class AnimatedField: UIView {
             counterLabel.textColor = format.counterColor
             alertLabel.font = format.alertFont
             alertLabelBottomConstraint.isActive = format.alertPosition == .top
+            lineView.isHidden = format.isLineHidden
         }
     }
     
@@ -316,6 +317,7 @@ open class AnimatedField: UIView {
     }
     
     private func setupLine() {
+        lineView.isHidden = format.isLineHidden
         lineView.backgroundColor = format.lineColor
     }
     
